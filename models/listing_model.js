@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import UserModel from "./user_model";
-
+import crops from "@/public/crops.json"
 const ListingSchema = new mongoose.Schema({
   farmer_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -10,7 +10,7 @@ const ListingSchema = new mongoose.Schema({
   title: String,
   crop: {
     type: String,
-    enum: ['wheat', 'rice', 'cotton', 'jute'],
+    enum: Object.keys(crops),
   },
   variety: String,
   grade: {

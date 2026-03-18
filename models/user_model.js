@@ -4,12 +4,12 @@ const UserSchema = new mongoose.Schema({
   lastname: String,
   email: { type: String, unique: true },
   password:String,
-  phone_number : {type : String, required : true,default : "-"},
+  phone_number : {type : String, required : false,default : "-"},
   role: {
     type: String,
     enum: ['farmer', 'buyer','admin'],
   },
-  address : String,
+  address : {type : String, required : false,default : ""},
   bids : [
     {
       type: mongoose.Schema.Types.ObjectId,

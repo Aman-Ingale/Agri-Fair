@@ -1,0 +1,149 @@
+{
+  "Rice": [
+    "IR64",
+    "Swarna",
+    "MTU 1010",
+    "Pusa Basmati 1121",
+    "Basmati 370",
+    "Sahbhagi Dhan",
+    "DRR Dhan 42"
+  ],
+  "Wheat": [
+    "HD 2967",
+    "PBW 343",
+    "WH 1105",
+    "Lok 1",
+    "HD 3086"
+  ],
+  "Maize": [
+    "HQPM 1",
+    "DHM 117",
+    "Ganga 5",
+    "Pratap Makka 5"
+  ],
+  "Bajra": [
+    "HHB 67",
+    "ICTP 8203",
+    "Pusa 322"
+  ],
+  "Jowar": [
+    "CSH 14",
+    "CSV 15",
+    "M 35-1"
+  ],
+  "Ragi": [
+    "GPU 28",
+    "GPU 67",
+    "Indaf 5"
+  ],
+  "Gram (Chana)": [
+    "JG 11",
+    "Pusa 372",
+    "BG 256"
+  ],
+  "Arhar (Tur)": [
+    "ICPL 87119",
+    "Asha",
+    "UPAS 120"
+  ],
+  "Moong": [
+    "Pusa Vishal",
+    "SML 668",
+    "Samrat"
+  ],
+  "Urad": [
+    "PU 31",
+    "T9",
+    "LBG 752"
+  ],
+  "Groundnut": [
+    "JL 24",
+    "GG 20",
+    "TAG 24"
+  ],
+  "Mustard": [
+    "Pusa Bold",
+    "Varuna",
+    "Pusa Mustard 25"
+  ],
+  "Soybean": [
+    "JS 335",
+    "JS 9305",
+    "NRC 37"
+  ],
+  "Sunflower": [
+    "Morden",
+    "KBSH 1",
+    "KBSH 44"
+  ],
+  "Sugarcane": [
+    "Co 0238",
+    "Co 86032",
+    "Co 99004"
+  ],
+  "Cotton": [
+    "Bt Cotton",
+    "LRA 5166",
+    "DCH 32"
+  ],
+  "Jute": [
+    "JRO 524",
+    "JRC 321"
+  ],
+  "Tea": [
+    "TV 1",
+    "TV 23",
+    "UPASI 9"
+  ],
+  "Coffee": [
+    "Arabica",
+    "Robusta"
+  ],
+  "Rubber": [
+    "RRII 105",
+    "RRII 414"
+  ],
+  "Mango": [
+    "Alphonso",
+    "Kesar",
+    "Dasheri",
+    "Langra"
+  ],
+  "Banana": [
+    "Dwarf Cavendish",
+    "Robusta",
+    "Nendran"
+  ],
+  "Apple": [
+    "Red Delicious",
+    "Golden Delicious"
+  ],
+  "Potato": [
+    "Kufri Jyoti",
+    "Kufri Pukhraj"
+  ],
+  "Tomato": [
+    "Pusa Ruby",
+    "Arka Rakshak"
+  ],
+  "Onion": [
+    "Nasik Red",
+    "Pusa Red"
+  ],
+  "Turmeric": [
+    "Lakadong",
+    "Rajendra Sonia"
+  ],
+  "Chilli": [
+    "Byadgi",
+    "Guntur Sannam"
+  ],
+  "Cardamom": [
+    "Malabar",
+    "Mysore"
+  ],
+  "Black Pepper": [
+    "Panniyur 1",
+    "Karimunda"
+  ]
+}

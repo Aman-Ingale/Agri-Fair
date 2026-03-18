@@ -20,3 +20,15 @@ export async function POST(req) {
         return Response.json({ success: false, message: "Internal Server Error" }, { status: 500 })
     }
 }
+export async function DELETE() {
+    const cookie = await cookies();
+    try {
+        cookie.delete('role');
+        cookie.delete('id');
+        const response = Response.json({ success: true, message: "Success" }, { status: 200 })
+        return response
+    } catch (error) {
+        console.log("Something went wrong", error)
+        return Response.json({ success: false, message: "Internal Server Error" }, { status: 500 })
+    }
+}

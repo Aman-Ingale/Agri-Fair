@@ -1,5 +1,5 @@
 "use client"
-import { Book, Menu, Store, Sunset, Trees, Zap } from "lucide-react";
+import { Book, Menu, Plus, Store, Sunset, Trees, Zap, } from "lucide-react";
 
 import {
   Accordion,
@@ -26,6 +26,9 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import ProfileMenu from "../profileMenu";
+import Cookies from "js-cookie";
+import { LayoutDashboard } from "lucide-react";
+
 const Navbar1 = ({
   menu = [
     { title: "Home", url: "http://localhost:3000/" },
@@ -39,11 +42,34 @@ const Navbar1 = ({
     },
   ],
   auth = {
-    login: { title: "Login", url: "#" },
-    signup: { title: "Sign up", url: "#" },
+    login: { title: "Login", url: "/login" },
+    signup: { title: "Sign up", url: "/signup" },
   },
+  initialVerified 
 }) => {
-  const [verified, setVerified] = useState(true)
+  const [verified, setVerified] = useState(initialVerified)
+  const [mounted, setMounted] = useState(false);
+  const [role, setRole] = useState("")
+  const [id, setId] = useState("")
+
+    useEffect(() => {
+    setVerified(initialVerified);
+    setRole(Cookies.get("role"));
+    setMounted(true);
+  }, [initialVerified]);
+  // useEffect(() => {
+  //   const role = Cookies.get("role");
+  //   const id = Cookies.get("id");
+  //   setRole(role);
+  //   setId(id);
+  //   if (id) {
+  //     setVerified(true)
+  //   }
+  //   else{
+  //     setVerified(false)
+  //   }
+  // }, [])
+  if (!mounted) return null;
   return (
     <section className="py-4 bg-gradient-to-r from-green-50 to-white dark:from-green-950/20 dark:to-black border-b border-green-200 dark:border-green-800/30">
       <div className="container">
@@ -61,22 +87,33 @@ const Navbar1 = ({
               <NavigationMenu>
                 <NavigationMenuList>
                   {menu.map((item) => renderMenuItem(item))}
+
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
           </div>
           <div className="flex gap-4 items-center">
+            {verified && role === "farmer" && (
+              <>
+              <Link href="/addListing"><div className="bg-white h-8 w-15 flex items-center justify-center rounded-md cursor-pointer shadow"><Plus color="gray" /></div></Link>
+            <Link href="/dashboard"><div className="bg-white h-8 w-15 flex items-center justify-center rounded-md cursor-pointer shadow"><LayoutDashboard color="gray" /></div></Link>
+            </>)
+            }
+
             {!verified ? (<div className="flex gap-2 ">
+            
+
               <Button asChild variant="outline" size="sm" className="border-green-600 text-green-700 hover:bg-green-50 dark:border-green-400 dark:text-green-400">
-                <a href={auth.login.url}>{auth.login.title}</a>
+                <Link href={auth.login.url}>{auth.login.title}</Link>
               </Button>
               <Button asChild size="sm" className="bg-green-600 hover:bg-green-700 text-white dark:bg-green-700 dark:hover:bg-green-600">
-                <a href={auth.signup.url}>{auth.signup.title}</a>
+                <Link href={auth.signup.url}>{auth.signup.title}</Link>
               </Button>
             </div>) :
-            <div className="mx-5">
-              <ProfileMenu />
-            </div>
+            
+              <div className="mx-5">
+                <ProfileMenu />
+              </div>
             }
           </div>
         </nav>
@@ -85,12 +122,12 @@ const Navbar1 = ({
         <div className="block lg:hidden">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <a className="flex items-center gap-2 mx-3 text-green-800 dark:text-green-400">
+            <Link href="/" className="flex items-center gap-2 mx-3 text-green-800 dark:text-green-400">
               <Store className="text-green-600 dark:text-green-400" />
               <span className="text-lg font-semibold">
                 AgriFair
               </span>
-            </a>
+            </Link>
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon" className="border-green-200 dark:border-green-800/30">
@@ -100,12 +137,12 @@ const Navbar1 = ({
               <SheetContent className="overflow-y-auto bg-gradient-to-br from-green-50 to-white dark:from-green-950/20 dark:to-black">
                 <SheetHeader>
                   <SheetTitle>
-                      <a className="flex items-center gap-2 text-green-800 dark:text-green-400">
-              <Store className="text-green-600 dark:text-green-400" />
-              <span className="text-lg font-semibold">
-                AgriFair
-              </span>
-            </a>
+                    <a className="flex items-center gap-2 text-green-800 dark:text-green-400">
+                      <Store className="text-green-600 dark:text-green-400" />
+                      <span className="text-lg font-semibold">
+                        AgriFair
+                      </span>
+                    </a>
                   </SheetTitle>
                 </SheetHeader>
                 <div className="flex flex-col gap-6 p-4">

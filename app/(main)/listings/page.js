@@ -8,6 +8,8 @@ import { toast } from "sonner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Wheat, MapPin, Clock, Gavel, IndianRupee, PackageCheck, Search, Filter, Sprout, Star, Banknote } from "lucide-react";
 import { cache, useEffect, useState } from "react";
+import crops from "@/public/crops.json";
+import Cookies from "js-cookie";
 export default function Listings() {
   const [isPopup, setIsPopup] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -21,33 +23,34 @@ export default function Listings() {
   const [filterCrop, setFilterCrop] = useState("")
   const [filterVariety, setFilterVariety] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
+  const [isFarmer, setIsFarmer] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const url = process.env.NEXT_PUBLIC_BASE_URL;
-  async function handleApplyFilter() {
-    // setIsLoading(true)
-    fetch(`${url}/api/listings?crop=${filterCrop}&variety=${filterVariety}&grade_min=${filteredGrade[0]}&grade_max=5&location=${filterLocation}&search=${searchQuery}`)
-      .then(response => {
-        if (!response.ok) {
-          console.log("Network response was not ok " + response.status);
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log("Data:", data);
-        setListings(data.data)
-      })
-      .catch(error => {
-        console.error("Fetch error:", error);
 
-      });
+  function handleApplyFilter() {
+  const params = new URLSearchParams();
 
-  }
+  if (filterCrop) params.append("crop", filterCrop);
+  if (filterVariety) params.append("variety", filterVariety);
+  if (filterLocation) params.append("location", filterLocation);
+  if (searchQuery) params.append("search", searchQuery);
+
+  params.append("grade_min", filteredGrade[0]);
+  params.append("grade_max", 5);
+
+  fetch(`${url}/api/listings?${params.toString()}`)
+    .then((res) => res.json())
+    .then((data) => setListings(data.data))
+    .catch((err) => console.error(err));
+}
   function handleClearAll() {
-    setFilterLocation("")
-    setFilterCrop("")
-    setFilterVariety("")
-    setFilteredGrade([1])
-    getData()
-  }
+  setFilterLocation("");
+  setFilterCrop("");
+  setFilterVariety("");
+  setFilteredGrade([1]);
+  setSearchQuery("");
+  getData();
+}
   const formatter = new Intl.NumberFormat("en-IN", {
     style: "decimal",
     maximumFractionDigits: 2,
@@ -120,9 +123,15 @@ export default function Listings() {
   }
   useEffect(() => {
     getData()
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 500);
+    setIsLoading(false)
+    const role = Cookies.get("role");
+    if(role === "farmer"){
+      setIsFarmer(true)
+      
+    }
+    else{
+      setIsFarmer(false)
+    }
   }, [])
   return (
     <>
@@ -182,7 +191,7 @@ export default function Listings() {
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-between w-full mt-10 gap-4">
+              <div className={`flex flex-col sm:flex-row items-center justify-between w-full mt-10 gap-4 ${isFarmer? "hidden" : ""}`}>
                 <div className="w-full sm:w-1/3 flex sm:flex-col gap-3 ">
                   <div className="flex items-center justify-between gap-1 w-full sm:w-full">
                     <div><p>Quant.:</p></div>
@@ -206,78 +215,108 @@ export default function Listings() {
         )}
 
         {/* Filters Sidebar */}
-        <div className="h-fit w-full lg:w-1/4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-green-200 dark:border-green-800/30 rounded-lg flex flex-col items-center shadow-md p-2">
-          <div className="mt-4 h-10 font-semibold gap-1.5 flex flex-row items-center text-green-800 dark:text-green-400">
-            <Filter size={22} className="text-green-600 dark:text-green-400" />Filters
-          </div>
-          <div className="w-full flex flex-col h-full gap-4 p-3">
-            {/* Location */}
-            <div className="w-full flex flex-col gap-2">
-              <div>Location</div>
-              <Select value={filterLocation} onValueChange={(v) => setFilterLocation(v)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="eg. Nagpur" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="indore">Indore</SelectItem>
-                  <SelectItem value="nagpur">Nagpur</SelectItem>
-                  <SelectItem value="kolkata">Kolkata</SelectItem>
-                  <SelectItem value="kanpur">Kanpur</SelectItem>
-                  <SelectItem value="raipur">Raipur</SelectItem>
-                  <SelectItem value="surat">Surat</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+<div className={`h-fit w-full lg:w-1/4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-green-200 dark:border-green-800/30 rounded-lg flex flex-col items-center shadow-md p-2 ${isFarmer ? "hidden" : ""}`}>
+  
+  <div className="mt-4 h-10 font-semibold gap-1.5 flex flex-row items-center text-green-800 dark:text-green-400">
+    <Filter size={22} className="text-green-600 dark:text-green-400" />
+    Filters
+  </div>
 
-            {/* Crop */}
-            <div className="w-full flex flex-col gap-2">
-              <div>Crop</div>
-              <Select value={filterCrop} onValueChange={(v) => setFilterCrop(v)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="eg. Wheat" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="wheat">Wheat</SelectItem>
-                  <SelectItem value="rice">Rice</SelectItem>
-                  <SelectItem value="jute">Jute</SelectItem>
-                  <SelectItem value="cotton">Cotton</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+  <div className="w-full flex flex-col h-full gap-4 p-3">
 
-            {/* Variety */}
-            <div className="w-full flex flex-col gap-2">
-              <div>Variety</div>
-              <Select value={filterVariety} onValueChange={(v) => setFilterVariety(v)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="eg. Sharbati" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sharbati">Sharbati</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+    {/* Location INPUT */}
+    <div className="w-full flex flex-col gap-2">
+      <div>Location</div>
+      <Input
+        placeholder="e.g. Pune"
+        value={filterLocation}
+        onChange={(e) => setFilterLocation(e.target.value)}
+      />
+    </div>
 
-            {/* Grade */}
-            <div className="w-full flex flex-col gap-2">
-              <div>Minimum Grade</div>
-              <div className="flex flex-row gap-3 items-center">
-                <Slider value={filteredGrade} onValueChange={setFilteredGrade} defaultValue={[1]} min={1} max={5} step={1} />
-                <div className="flex flex-row items-center gap-1 text-gray-500 font-semibold">
-                  <div>{filteredGrade}</div>
-                  <Star fill="gold" color="gold" size={15} />
-                </div>
-              </div>
-              <div className="flex justify-between mt-5">
-                <button className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300" onClick={handleClearAll}>Clear all</button>
-                <Button onClick={handleApplyFilter} className="bg-green-600 hover:bg-green-700 text-white dark:bg-green-700 dark:hover:bg-green-600">Apply</Button>
-              </div>
-            </div>
-          </div>
+    {/* Crop */}
+    <div className="w-full flex flex-col gap-2">
+      <div>Crop</div>
+      <Select
+        value={filterCrop}
+        onValueChange={(value) => {
+          setFilterCrop(value);
+          setFilterVariety(""); // reset variety
+        }}
+      >
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Select crop" />
+        </SelectTrigger>
+        <SelectContent>
+          {Object.keys(crops).map((crop) => (
+            <SelectItem key={crop} value={crop}>
+              {crop}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+
+    {/* Variety (dependent) */}
+    <div className="w-full flex flex-col gap-2">
+      <div>Variety</div>
+      <Select
+        value={filterVariety}
+        onValueChange={(value) => setFilterVariety(value)}
+        disabled={!filterCrop}
+      >
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Select variety" />
+        </SelectTrigger>
+        <SelectContent>
+          {crops[filterCrop]?.map((v) => (
+            <SelectItem key={v} value={v}>
+              {v}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+
+    {/* Grade */}
+    <div className="w-full flex flex-col gap-2">
+      <div>Minimum Grade</div>
+
+      <div className="flex flex-row gap-3 items-center">
+        <Slider
+          value={filteredGrade}
+          onValueChange={setFilteredGrade}
+          min={1}
+          max={5}
+          step={1}
+        />
+        <div className="flex items-center gap-1 text-gray-500 font-semibold">
+          <div>{filteredGrade[0]}</div>
+          <Star fill="gold" color="gold" size={15} />
         </div>
+      </div>
+
+      <div className="flex justify-between mt-5">
+        <button
+          className="text-green-600 hover:text-green-700"
+          onClick={handleClearAll}
+        >
+          Clear all
+        </button>
+
+        <Button
+          onClick={handleApplyFilter}
+          className="bg-green-600 hover:bg-green-700 text-white"
+        >
+          Apply
+        </Button>
+      </div>
+    </div>
+  </div>
+</div>
 
         {/* Listings Section */}
-        <div className="flex flex-col h-fit w-full lg:w-3/4 items-center p-5">
+        <div className={`flex flex-col h-fit w-full  items-center p-5 ${isFarmer ? "w-3/4" : ""}`}>
           {/* Search Box */}
           <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-green-200 dark:border-green-800/30 w-full sm:w-3/4 lg:w-1/2 h-10 mb-10 flex justify-center items-center gap-2 p-2 rounded-md shadow-md">
             <Input onChange={(e) => setSearchQuery(e.target.value)} className="flex-1 focus-visible:outline-none border-none focus-visible:border-none " placeholder="Search..." />

@@ -18,6 +18,8 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { Navbar1 } from "@/components/ui/navbar1";
+import NavbarWrapper from "@/components/ui/navbarWrapper";
 
 // static categories for UI
 const categories = [
@@ -50,51 +52,18 @@ const steps = [
   },
 ];
 
+const url = process.env.NEXT_PUBLIC_BASE_URL;
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const aboutRef = useRef(null);
   const categoriesRef = useRef(null);
   const howItWorksRef = useRef(null);
   const getStartedRef = useRef(null);
-      const url = process.env.NEXT_PUBLIC_BASE_URL;
 
   const router = useRouter();
-  if (typeof window !== "undefined") {
-    localStorage.setItem("id", "690cd1e1594fb9950385d573");
-  }
-  useEffect(() => {
-    async function setCookie() {
-      fetch(`${url}/api/cookie`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body:JSON.stringify({
-          role:"buyer",
-          id:"690cd1e1594fb9950385d573"
-        })
-        // body:JSON.stringify({
-        //   role:"farmer",
-        //   id:"690cd1be594fb9950385d56f"
-        // })
-      })
-
-        .then(response => {
-          console.log(response)
-          if (!response.ok) {
-            throw new Error("Network response was not ok " + response.status);
-          }
-          return response.json(); // or response.text()
-        })
-        .catch(error => {
-          console.error("Fetch error:", error);
-
-        });
-    }
-    setCookie()
-  }, [])
 
   return (
+    <>
     <div className="flex flex-col min-h-screen">
       <main className="flex-1">
         {/* Hero Section */}
@@ -230,5 +199,5 @@ export default function HomePage() {
         </section>
       </main>
     </div>
-  );
+  </>);
 }

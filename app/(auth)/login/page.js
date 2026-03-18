@@ -29,6 +29,7 @@ const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z.string().trim().min(6, { message: "Password must be at least 6 characters long" }),
 });
+const url = process.env.NEXT_PUBLIC_BASE_URL;
 
 export default function LogInClient() {
   const router = useRouter();
@@ -44,18 +45,48 @@ export default function LogInClient() {
   async function onSubmit(values) {
     setIsLoading(true)
     console.log("Submitting:", values);
-        const r = await fetch("/api/login/client",{
+        const r = await fetch("/api/auth/login",{
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(values),
     });
     const result = await r.json();
     if (result.success) {
-        // toast.success('Login Succesfull', {
-        //   description: result.message,
-        // })
-      localStorage.setItem("id",result.data.toString());
-      router.push("/client/providers");
+      console.log(result.data)
+        toast.success('Login Succesfull', {
+          description: result.message,
+        })
+        setIsLoading(false)
+      fetch(`${url}/api/cookie`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body:JSON.stringify({
+          role:result.data.role,
+          id : result.data._id
+        })
+      })
+
+        .then(response => {
+          console.log(response)
+          if (!response.ok) {
+            throw new Error("Network response was not ok " + response.status);
+          }
+          return response.json(); // or response.text()
+        })
+        .catch(error => {
+          console.error("Fetch error:", error);
+
+        });
+    
+      // localStorage.setItem("id",result.data.toString());
+      if(result.data.role=='buyer'){
+        router.push("/listings");
+      }
+      else{
+        router.push("/dashboard");
+      }
     } else {
       setIsLoading(false)
             toast.error('Invalid Credential', {

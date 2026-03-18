@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import dbConnect from "@/lib/dbConnect";
+import dbConnect from "@/lib/dbConfig";
 import { createSession } from "@/lib/session";
 import UserModel from "@/models/user_model";
 export async function POST(req) {
@@ -29,7 +29,7 @@ export async function POST(req) {
         // await createSession(user._id.toString());
         await createSession(savedUser._id)
         
-        return NextResponse.json({ success: true, message: "User logged in successfully", data: UserID });
+        return NextResponse.json({ success: true, message: "User logged in successfully", data: savedUser });
     } catch (error) {
         console.log("Authorization Error:", error);
         return null;

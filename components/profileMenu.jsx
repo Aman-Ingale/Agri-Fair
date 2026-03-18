@@ -11,6 +11,7 @@ import {
 import { User, ShoppingBag, Settings, LogOut, Gavel } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { deleteSession } from "@/lib/session";
 
 export default function ProfileMenu() {
   const router = useRouter();
@@ -50,7 +51,7 @@ export default function ProfileMenu() {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem onClick={() => router.push("/logout")}>
+        <DropdownMenuItem onClick={() => deleteSession().then(() => router.push("/login"))}>
           <LogOut className="mr-2 h-4 w-4 text-red-500" />
           <span className="text-red-500">Logout</span>
         </DropdownMenuItem>

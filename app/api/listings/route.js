@@ -18,11 +18,15 @@
 import dbConnect from "@/lib/dbConfig"
 import ListingModel from "@/models/listing_model"
 import mongoose from "mongoose";
+import { cookies } from "next/headers";
+
 export async function POST(req) {
   await dbConnect()
+  const cookie = await cookies();
   try {
     const data = await req.json();
-    
+    const id = cookie.get("id").value;
+
     // Validate required fields
     if (
       // !data.farmer_id|| 
@@ -32,7 +36,7 @@ export async function POST(req) {
 
     const listing = ListingModel({
       // farmer_id: new mongoose.Types.ObjectId(data.farmer_id),
-      farmer_id: new mongoose.Types.ObjectId('690cd1be594fb9950385d56f'),
+      farmer_id: new mongoose.Types.ObjectId(id),
       title: data.title,
       crop: data.crop,
       variety: data.variety,
@@ -53,7 +57,20 @@ export async function POST(req) {
 export async function GET(req) {
   try {
     await dbConnect();
+    const cookie = await cookies();
+    const role = cookie.get("role").value;
+    const id = cookie.get("id").value;
+    if (role === 'farmer') {
+      const plainData = await ListingModel.find({
+        'farmer_id': new mongoose.Types.ObjectId(id)
+      });
+      const data = plainData.map((lis) => JSON.parse(JSON.stringify(lis)));
 
+      return Response.json(
+        { success: true, message: "Success", data },
+        { status: 200 }
+      );
+    }
     const { searchParams } = new URL(req.url);
     let filters = {};
 

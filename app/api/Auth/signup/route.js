@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import dbConnect from "@/lib/dbConnect";
+import dbConnect from "@/lib/dbConfig";
 import UserModel from "@/models/user_model";
 export async function POST(req){
   await dbConnect();
@@ -13,8 +13,6 @@ export async function POST(req){
       email: data.email,
       password: hashedPassword,
       role : data.role,
-      address : data.address,
-      phone_number  : data.phone
     });
     await newUser.save();
     return NextResponse.json({ success: true, message: "USER REGISTERED SUCCESSFULLY" });

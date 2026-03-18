@@ -67,26 +67,40 @@ const page = () => {
                     contact_number: "9999999"
                 })
             }
+
         ).then(response => {
             if (!response.ok) {
+
                 // throw new Error("Failed with status " + response.status);
             }
             return response.json();
-        })
-            .then(data => {
-                console.log("Created:", data);
-                console.log(bid._id)
-                handleDeleteListing(bid._id)
-                toast.success("Success", {
-                    description: "Order placed succesfully",
+        }).then(async data => {
+            console.log("Created:", data);
+            console.log(bid._id)
+            fetch(`${url}/api/bids/${bid._id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        updateData: {
+                            status: 'ordered'
+                        }
+                    })
                 })
+            await getData();
+            toast.success("Success", {
+                description: "Order placed succesfully",
             })
+        })
             .catch(error => {
                 console.error("Error:", error);
                 toast.error("Error!", {
                     description: "Something went wrong",
                 })
             });
+
 
 
 
@@ -99,8 +113,10 @@ const page = () => {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({updateData:{
-                    status:'accepted'}
+                body: JSON.stringify({
+                    updateData: {
+                        status: 'accepted'
+                    }
                 })
             }
         ).then(response => {
@@ -115,7 +131,6 @@ const page = () => {
                 toast.success("Success", {
                     description: "Bid Accepted",
                 })
-                getData()
             })
             .catch(error => {
                 console.error("Error:", error);
@@ -123,7 +138,7 @@ const page = () => {
                     description: "Something went wrong",
                 })
             });
-
+        await getData();
 
 
     }
@@ -223,24 +238,24 @@ const page = () => {
                                     <td
                                         className={`text-center py-3 px-2 sm:px-4 font-semibold capitalize ${txn.status === "accepted"
                                             ? "text-green-600 dark:text-green-400"
-                                            : txn.status === "rejected"
-                                                ? "text-red-600 dark:text-red-400"
-                                                : "text-yellow-600 dark:text-yellow-400"
+                                            : txn.status === "rejected" ? "text-red-600 dark:text-red-400" :
+                                                txn.status === "ordered" ? "text-blue-600 dark:text-blue-400"
+                                                    : "text-yellow-600 dark:text-yellow-400"
                                             }`}
                                     >
                                         {txn.status}
                                     </td>
                                     <td className="text-center py-3 px-2 sm:px-4">
                                         <Button onClick={() => handleOrder(bids[index])} className={`cursor-pointer text-xs sm:text-sm md:text-base px-2 sm:px-4 py-1 sm:py-2 bg-green-600 hover:bg-green-700 text-white dark:bg-green-700 dark:hover:bg-green-600                     
-                                        ${isBuyer && txn.status=='accepted'
-                                            ? ""
+                                        ${isBuyer && txn.status == 'accepted'
+                                                ? ""
                                                 : "hidden"
                                             }`}>
                                             Order
                                         </Button>
                                         <Button onClick={() => handleAccept(bids[index])} className={`cursor-pointer text-xs sm:text-sm md:text-base px-2 sm:px-4 py-1 sm:py-2 bg-green-600 hover:bg-green-700 text-white dark:bg-green-700 dark:hover:bg-green-600                     
-                                        ${!isBuyer && txn.status=='pending'
-                                            ? ""
+                                        ${!isBuyer && txn.status == 'pending'
+                                                ? ""
                                                 : "hidden"
                                             }`}>
                                             Accept
