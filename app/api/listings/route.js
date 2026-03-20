@@ -60,17 +60,6 @@ export async function GET(req) {
     const cookie = await cookies();
     const role = cookie.get("role").value;
     const id = cookie.get("id").value;
-    if (role === 'farmer') {
-      const plainData = await ListingModel.find({
-        'farmer_id': new mongoose.Types.ObjectId(id)
-      });
-      const data = plainData.map((lis) => JSON.parse(JSON.stringify(lis)));
-
-      return Response.json(
-        { success: true, message: "Success", data },
-        { status: 200 }
-      );
-    }
     const { searchParams } = new URL(req.url);
     let filters = {};
 
@@ -114,7 +103,9 @@ export async function GET(req) {
         { location: searchRegex },
       ];
     }
-
+      if (role === 'farmer') {
+      filters.farmer_id = new mongoose.Types.ObjectId(id); 
+    }
     const plainData = await ListingModel.find(filters);
     const data = plainData.map((lis) => JSON.parse(JSON.stringify(lis)));
 

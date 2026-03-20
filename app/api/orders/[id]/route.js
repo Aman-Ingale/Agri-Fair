@@ -1,8 +1,9 @@
 import dbConnect from "@/lib/dbConfig";
 import order_model from "@/models/order_model";
+import mongoose from "mongoose";
 export async function GET(req,{ params }) {
     const { id } = await params;
-    if (!Types.ObjectId.isValid(id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
         return Response.json({success:false,message: "Not Found"}, { status: 400 });
     }
     try {
@@ -22,7 +23,7 @@ export async function GET(req,{ params }) {
 export async function DELETE(req, { params }) {
   const { id } = await params;
 
-  if (!Types.ObjectId.isValid(id)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return Response.json({ success: false, message: "Invalid ID" }, { status: 400 });
   }
 
@@ -38,5 +39,26 @@ export async function DELETE(req, { params }) {
   } catch (error) {
     console.log("Something went wrong", error);
     return Response.json({ success: false, message: "Internal Server Error" }, { status: 500 });
+  }
+}
+export async function PUT(req, { params }) {
+  const { id } = await params
+  const {updateData} = await req.json()
+  console.log(updateData)
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return Response.json({ success: false, message: "Not Found" }, { status: 400 });
+  }
+  try {
+    await dbConnect()
+    const plainData = await order_model.updateOne(
+      { _id: id },
+      { $set: updateData }
+    );
+    console.log(plainData)
+    return Response.json({ success: true, message: "Updated" }, { status: 200 })
+  } catch (error) {
+    console.log("Something went wrong", error)
+    return Response.json({ success: false, message: "Internal Server Error" }, { status: 500 })
+
   }
 }

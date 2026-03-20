@@ -19,11 +19,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 const url = process.env.NEXT_PUBLIC_BASE_URL;
-
+import Cookies from "js-cookie";
 export default function DashboardPage() {
   const [farmer, setFarmer] = useState({});
   const [loading, setLoading] = useState(false);
-
+const formatter = new Intl.NumberFormat("en-IN", {
+        style: "decimal",
+        maximumFractionDigits: 2,
+    });
   // useEffect(() => {
   //   // In a real app, get farmer_id from session/auth context
   //   // For now, using a placeholder - replace with actual auth
@@ -56,9 +59,9 @@ export default function DashboardPage() {
   //   }
   // };
   async function getData() {
-    const id = localStorage.getItem("id");
-
-    fetch(`${url}/api/dashboard/id=${id}`, {
+    const id = Cookies.get('id');
+        
+    fetch(`${url}/api/dashboard/${id}`, {
       // cache: "force-cache"
     })
       .then(response => {
@@ -133,7 +136,7 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
-          <Link href="/addlisting"><div className="bg-white h-10 w-15 flex items-center justify-center rounded-md cursor-pointer shadow"><Plus color="gray"/></div></Link>
+          {/* <Link href="/addlisting"><div className="bg-white h-10 w-15 flex items-center justify-center rounded-md cursor-pointer shadow"><Plus color="gray"/></div></Link> */}
         </div>
 
         {/* farmer Grid */}
@@ -158,7 +161,7 @@ export default function DashboardPage() {
           />
           <StatCard
             title="Total Revenue"
-            value={`₹${farmer?.total_revenue}`}
+            value={`₹${formatter.format(farmer?.total_revenue || 0)}`}
             icon={DollarSign}
           // subtitle="From completed orders"
           />

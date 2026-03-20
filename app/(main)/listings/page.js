@@ -77,7 +77,7 @@ export default function Listings() {
           quantity: Number(quantity),
           title: title,
           variety: variety,
-          bid_price:Number(price)
+          bid_price:Number(bidPrice)
         })
       }
     ).then(response => {
@@ -215,7 +215,7 @@ export default function Listings() {
         )}
 
         {/* Filters Sidebar */}
-<div className={`h-fit w-full lg:w-1/4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-green-200 dark:border-green-800/30 rounded-lg flex flex-col items-center shadow-md p-2 ${isFarmer ? "hidden" : ""}`}>
+<div className={`h-fit w-full lg:w-1/4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-green-200 dark:border-green-800/30 rounded-lg flex flex-col items-center shadow-md p-2`}>
   
   <div className="mt-4 h-10 font-semibold gap-1.5 flex flex-row items-center text-green-800 dark:text-green-400">
     <Filter size={22} className="text-green-600 dark:text-green-400" />
@@ -316,7 +316,7 @@ export default function Listings() {
 </div>
 
         {/* Listings Section */}
-        <div className={`flex flex-col h-fit w-full  items-center p-5 ${isFarmer ? "w-3/4" : ""}`}>
+        <div className={`flex flex-col h-fit w-full  items-center p-5`}>
           {/* Search Box */}
           <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-green-200 dark:border-green-800/30 w-full sm:w-3/4 lg:w-1/2 h-10 mb-10 flex justify-center items-center gap-2 p-2 rounded-md shadow-md">
             <Input onChange={(e) => setSearchQuery(e.target.value)} className="flex-1 focus-visible:outline-none border-none focus-visible:border-none " placeholder="Search..." />

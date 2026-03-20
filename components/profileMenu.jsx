@@ -25,7 +25,7 @@ export default function ProfileMenu() {
           size="icon"
           className="rounded-full transition "
         >
-          <User className="h-10 w-10" color="black"  />
+          <User className="h-14" color="green" />
         </Button>
       </DropdownMenuTrigger>
 
@@ -35,7 +35,7 @@ export default function ProfileMenu() {
         {/* <DropdownMenuSeparator /> */}
 
         <DropdownMenuItem onClick={() => router.push("/profile")}>
-          <User className="mr-2 h-4 w-4" />
+          <User className="mr-2 h-10 w-10" />
           Profile
         </DropdownMenuItem>
 

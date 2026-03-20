@@ -17,3 +17,26 @@ export async function GET(req) {
 
     }
 }
+export async function PUT(req, { params }) {
+    const cookie = await cookies();
+    const role = await cookie.get('role').value;
+    const id = await cookie.get('id').value;
+    const { updateData } = await req.json()
+    console.log(updateData)
+    if (!Types.ObjectId.isValid(id)) {
+        return Response.json({ success: false, message: "Not Found" }, { status: 400 });
+    }
+    try {
+        await dbConnect()
+        const plainData = await UserModel.updateOne(
+            { _id: id },
+            { $set: updateData }
+        );
+        console.log(plainData)
+        return Response.json({ success: true, message: "Updated" }, { status: 200 })
+    } catch (error) {
+        console.log("Something went wrong", error)
+        return Response.json({ success: false, message: "Internal Server Error" }, { status: 500 })
+
+    }
+}

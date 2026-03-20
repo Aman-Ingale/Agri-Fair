@@ -56,7 +56,6 @@ export default function LogInClient() {
         toast.success('Login Succesfull', {
           description: result.message,
         })
-        setIsLoading(false)
       fetch(`${url}/api/cookie`, {
         method: "POST",
         headers: {

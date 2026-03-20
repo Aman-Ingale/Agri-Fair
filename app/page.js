@@ -4,6 +4,40 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  Book,
+  Menu,
+  Plus,
+  Store,
+  Sunset,
+  Trees,
+  Zap,
+  LayoutDashboard,
+} from "lucide-react";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
   Search,
   Wheat,
   Sprout,
@@ -20,6 +54,7 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Navbar1 } from "@/components/ui/navbar1";
 import NavbarWrapper from "@/components/ui/navbarWrapper";
+import { deleteSession } from "@/lib/session";
 
 // static categories for UI
 const categories = [
@@ -59,11 +94,124 @@ export default function HomePage() {
   const categoriesRef = useRef(null);
   const howItWorksRef = useRef(null);
   const getStartedRef = useRef(null);
+  useEffect(() => {
+    deleteSession()
+  }, [])
 
   const router = useRouter();
 
   return (
     <>
+    <section className="fixed top-0 left-0 w-full z-50 py-4 
+bg-gradient-to-r from-green-50 to-white 
+dark:from-green-950/20 dark:to-black 
+border-b border-green-200 dark:border-green-800/30 
+backdrop-blur-md">
+      <div className="container">
+        {/* Desktop Menu */}
+        <nav className="hidden justify-between lg:flex">
+          <div className="flex items-center gap-6">
+            {/* Logo */}
+            <Link
+              href="/"
+              className="flex items-center gap-2 mx-3 text-green-800 dark:text-green-400"
+            >
+              <Store className="text-green-600 dark:text-green-400" />
+              <span className="text-lg font-semibold">AgriFair</span>
+            </Link>
+
+            {/* <NavigationMenu>
+              <NavigationMenuList>
+                {menu.map((item) => renderMenuItem(item))}
+              </NavigationMenuList>
+            </NavigationMenu> */}
+          </div>
+
+          <div className="flex gap-4 items-center mx-2">
+            {/* {verified && role === "farmer" && (
+              <>
+                <Link href="/addListing">
+                  <div className="bg-white h-8 w-15 flex items-center justify-center rounded-md cursor-pointer shadow">
+                    <Plus color="green" />
+                  </div>
+                </Link>
+
+                <Link href="/dashboard">
+                  <div className="bg-white h-8 w-15 flex items-center justify-center rounded-md cursor-pointer shadow">
+                    <LayoutDashboard color="green" />
+                  </div>
+                </Link>
+              </>
+            )} */}
+
+              <div className="flex gap-2">
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="border-green-600 text-green-700 hover:bg-green-50"
+                >
+                  <Link href="/login">Login</Link>
+                </Button>
+
+                <Button
+                  asChild
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Link href="/signup">Sign up</Link>
+                </Button>
+              </div>
+          </div>
+        </nav>
+
+        {/* Mobile Menu */}
+        <div className="block lg:hidden">
+          <div className="flex items-center justify-between">
+            <Link
+              href="/"
+              className="flex items-center gap-2 mx-3 text-green-800 dark:text-green-400"
+            >
+              <Store className="text-green-600 dark:text-green-400" />
+              <span className="text-lg font-semibold">AgriFair</span>
+            </Link>
+
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Menu className="size-4 text-green-800 dark:text-green-400" />
+                </Button>
+              </SheetTrigger>
+
+              <SheetContent className="overflow-y-auto bg-gradient-to-br from-green-50 to-white dark:from-green-950/20 dark:to-black">
+                <SheetHeader>
+                  <SheetTitle>
+                    <div className="flex items-center gap-2 text-green-800 dark:text-green-400">
+                      <Store className="text-green-600 dark:text-green-400" />
+                      <span className="text-lg font-semibold">
+                        AgriFair
+                      </span>
+                    </div>
+                  </SheetTitle>
+                </SheetHeader>
+
+                {/* <div className="flex flex-col gap-6 p-4">
+                  <Accordion
+                    type="single"
+                    collapsible
+                    className="flex w-full flex-col gap-4"
+                  >
+                    {menu.map((item) =>
+                      renderMobileMenuItem(item)
+                    )}
+                  </Accordion>
+                </div> */}
+              </SheetContent>
+            </Sheet>
+          </div>
+        </div>
+      </div>
+    </section>
     <div className="flex flex-col min-h-screen">
       <main className="flex-1">
         {/* Hero Section */}
@@ -179,12 +327,12 @@ export default function HomePage() {
                 Whether you're a farmer or a buyer, start connecting today for a fairer and smarter agricultural market.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/signup/buyer">
+                <Link href="/signup">
                   <Button size="lg" className="w-full sm:w-auto bg-green-600 hover:bg-green-700">
                     Buy Crops
                   </Button>
                 </Link>
-                <Link href="/signup/farmer">
+                <Link href="/signup">
                   <Button
                     size="lg"
                     variant="outline"
