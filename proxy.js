@@ -5,6 +5,7 @@ import { getJwtSecretKey } from "@/lib/jwtSecret";
 const SESSION_COOKIE_NAME = "session";
 
 const AUTH_PAGES = new Set(["/login", "/signup"]);
+
 const PROTECTED_PAGE_PREFIXES = [
   "/dashboard",
   "/orders",
@@ -13,7 +14,10 @@ const PROTECTED_PAGE_PREFIXES = [
   "/addListing",
   "/addlisting",
 ];
+
 const BUYER_BLOCKED_PAGE_PREFIXES = ["/dashboard"];
+
+// ---------- Helpers ----------
 
 function isProtectedPage(pathname) {
   return PROTECTED_PAGE_PREFIXES.some(
@@ -34,13 +38,13 @@ function isBuyerBlockedPage(pathname) {
 function isPublicApi(pathname, method) {
   if (!pathname.startsWith("/api/")) return false;
 
-  // Auth endpoints must remain public (case-insensitive for filesystem/OS differences)
+  // Auth endpoints must remain public
   if (pathname.toLowerCase().startsWith("/api/auth")) return true;
 
-  // Cookie helper is used right after login
+  // Cookie helper
   if (pathname === "/api/cookie") return true;
 
-  // Allow browsing listings without a session; protect mutations
+  // Listings read allowed, write protected
   if (pathname.startsWith("/api/listings")) {
     return method === "GET";
   }
@@ -50,15 +54,17 @@ function isPublicApi(pathname, method) {
 
 async function verifySessionToken(token) {
   if (!token) return null;
+
   try {
     const key = getJwtSecretKey();
+
     const { payload } = await jwtVerify(token, key, {
       algorithms: ["HS256"],
     });
 
     if (!payload?.userId) return null;
 
-    // `expires` is stored as a Date when created; JWT serializes it as a string.
+    // Expiry check
     if (payload?.expires) {
       const expMs = new Date(payload.expires).getTime();
       if (Number.isFinite(expMs) && expMs < Date.now()) return null;
@@ -70,16 +76,19 @@ async function verifySessionToken(token) {
   }
 }
 
-export async function middleware(request) {
+// ---------- MAIN PROXY ----------
+
+export async function proxy(request) {
   const { pathname } = request.nextUrl;
   const method = request.method;
 
   const sessionToken = request.cookies.get(SESSION_COOKIE_NAME)?.value;
   const session = await verifySessionToken(sessionToken);
+
   const isAuthed = Boolean(session?.userId);
   const role = request.cookies.get("role")?.value;
 
-  // API protection (prefer JSON 401 over redirect)
+  // ---------- API PROTECTION ----------
   if (pathname.startsWith("/api/") && !isPublicApi(pathname, method)) {
     if (!isAuthed) {
       return NextResponse.json(
@@ -90,7 +99,7 @@ export async function middleware(request) {
     return NextResponse.next();
   }
 
-  // Page protection
+  // ---------- PAGE PROTECTION ----------
   if (isProtectedPage(pathname) && !isAuthed) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
@@ -98,7 +107,7 @@ export async function middleware(request) {
     return NextResponse.redirect(url);
   }
 
-  // Role-based access: buyers cannot access dashboard (everything else is common)
+  // ---------- ROLE-BASED ACCESS ----------
   if (isAuthed && role === "buyer" && isBuyerBlockedPage(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/listings";
@@ -106,7 +115,7 @@ export async function middleware(request) {
     return NextResponse.redirect(url);
   }
 
-  // Prevent logged-in users from going back to login/signup
+  // ---------- AUTH PAGE BLOCK ----------
   if (isAuthPage(pathname) && isAuthed) {
     const url = request.nextUrl.clone();
     url.pathname = role === "buyer" ? "/listings" : "/dashboard";
@@ -117,10 +126,10 @@ export async function middleware(request) {
   return NextResponse.next();
 }
 
+// ---------- MATCHER ----------
+
 export const config = {
   matcher: [
-    // All pages + APIs, excluding Next internals and static files
     "/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)",
   ],
 };
-
