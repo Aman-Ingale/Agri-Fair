@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { jwtVerify } from "jose";
+import { jwtVerify } from "jose/jwt/verify";
+import { getJwtSecretKey } from "@/lib/jwtSecret";
 
 const SESSION_COOKIE_NAME = "session";
-const JWT_SECRET = new TextEncoder().encode("aman");
 
 const AUTH_PAGES = new Set(["/login", "/signup"]);
 const PROTECTED_PAGE_PREFIXES = [
@@ -34,8 +34,8 @@ function isBuyerBlockedPage(pathname) {
 function isPublicApi(pathname, method) {
   if (!pathname.startsWith("/api/")) return false;
 
-  // Auth endpoints must remain public
-  if (pathname.startsWith("/api/auth")) return true;
+  // Auth endpoints must remain public (case-insensitive for filesystem/OS differences)
+  if (pathname.toLowerCase().startsWith("/api/auth")) return true;
 
   // Cookie helper is used right after login
   if (pathname === "/api/cookie") return true;
@@ -51,7 +51,8 @@ function isPublicApi(pathname, method) {
 async function verifySessionToken(token) {
   if (!token) return null;
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET, {
+    const key = getJwtSecretKey();
+    const { payload } = await jwtVerify(token, key, {
       algorithms: ["HS256"],
     });
 

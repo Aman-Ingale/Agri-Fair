@@ -21,7 +21,6 @@ const page = () => {
     const [updatingBidId, setUpdatingBidId] = useState(null);
     const [orderingBidId, setOrderingBidId] = useState(null);
 
-    const url = process.env.NEXT_PUBLIC_BASE_URL;
     const router = useRouter();
 
     const formatter = new Intl.NumberFormat("en-IN", {
@@ -35,7 +34,7 @@ const page = () => {
         try {
             setLoading(true);
 
-            const res = await fetch(`${url}/api/bids`);
+            const res = await fetch("/api/bids");
             const data = await res.json();
 
             if (!res.ok) throw new Error(data.message);
@@ -60,7 +59,7 @@ const page = () => {
     async function updateBidStatus(bidId, status) {
         setUpdatingBidId(bidId);
         try {
-            const res = await fetch(`${url}/api/bids/${bidId}`, {
+            const res = await fetch(`/api/bids/${bidId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -94,7 +93,7 @@ const page = () => {
     async function handleOrder(bid) {
         try {
             setOrderingBidId(bid._id);
-            const res = await fetch(`${url}/api/orders`, {
+            const res = await fetch("/api/orders", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

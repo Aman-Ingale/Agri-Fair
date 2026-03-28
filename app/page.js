@@ -87,7 +87,6 @@ const steps = [
   },
 ];
 
-const url = process.env.NEXT_PUBLIC_BASE_URL;
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const aboutRef = useRef(null);

@@ -32,6 +32,9 @@ export async function POST(req) {
         return NextResponse.json({ success: true, message: "User logged in successfully", data: savedUser });
     } catch (error) {
         console.log("Authorization Error:", error);
-        return null;
+        return NextResponse.json(
+            { success: false, message: "Server error during login" },
+            { status: 500 }
+        );
     }
 }

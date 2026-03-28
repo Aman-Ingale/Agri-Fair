@@ -7,8 +7,6 @@ import { Label } from "@/components/ui/label"
 import { Loader2, User, Edit2, Save } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-const url = process.env.NEXT_PUBLIC_BASE_URL;
-
 export default function ClientProfile() {
     const [isEditing, setIsEditing] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
@@ -23,7 +21,7 @@ export default function ClientProfile() {
     const handleSave = async () => {
         setIsLoading(true)
         try {
-            const res = await fetch(`${url}/api/profile`, {
+            const res = await fetch("/api/profile", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -51,7 +49,7 @@ export default function ClientProfile() {
     async function getData() {
         setIsLoading(true)
         try {
-            const res = await fetch(`${url}/api/profile`)
+            const res = await fetch("/api/profile")
             const data = await res.json().catch(() => null)
             if (!res.ok) {
                 throw new Error(data?.message || `HTTP ${res.status}`)

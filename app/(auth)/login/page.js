@@ -29,8 +29,6 @@ const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z.string().trim().min(6, { message: "Password must be at least 6 characters long" }),
 });
-const url = process.env.NEXT_PUBLIC_BASE_URL;
-
 export default function LogInClient() {
   const router = useRouter();
   const [isLoading,setIsLoading] = useState(false)
@@ -56,7 +54,7 @@ export default function LogInClient() {
         toast.success('Login Succesfull', {
           description: result.message,
         })
-      fetch(`${url}/api/cookie`, {
+      fetch("/api/cookie", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

@@ -18,8 +18,8 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-const url = process.env.NEXT_PUBLIC_BASE_URL;
 import Cookies from "js-cookie";
+import { toast } from "sonner";
 export default function DashboardPage() {
   const [farmer, setFarmer] = useState({});
   const [loading, setLoading] = useState(false);
@@ -68,7 +68,7 @@ const formatter = new Intl.NumberFormat("en-IN", {
         return
       }
 
-      const res = await fetch(`${url}/api/dashboard/${id}`)
+      const res = await fetch(`/api/dashboard/${id}`)
       const data = await res.json().catch(() => null)
       if (!res.ok) {
         throw new Error(data?.message || `HTTP ${res.status}`)

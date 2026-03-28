@@ -21,8 +21,6 @@ import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
 import crops from "@/public/crops.json";
 
-const url = process.env.NEXT_PUBLIC_BASE_URL;
-
 export default function AddListingPage() {
   const [loading, setLoading] = useState(false);
 
@@ -99,7 +97,7 @@ export default function AddListingPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${url}/api/listings`, {
+      const response = await fetch("/api/listings", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

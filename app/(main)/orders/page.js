@@ -10,10 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { is } from "zod/v4/locales";
 import Cookies from "js-cookie";
-
-const url = process.env.NEXT_PUBLIC_BASE_URL;
 
 function Page() {
     const [orders, setOrders] = useState([]);
@@ -28,7 +25,7 @@ function Page() {
         try {
             setLoading(true);
 
-            const res = await fetch(`${url}/api/orders`);
+            const res = await fetch("/api/orders");
             const data = await res.json();
 
             if (!res.ok) throw new Error(data.message);
@@ -48,7 +45,7 @@ function Page() {
     async function updateOrderStatus(orderId, status) {
         setUpdatingOrderId(orderId);
         try {
-            const res = await fetch(`${url}/api/orders/${orderId}`, {
+            const res = await fetch(`/api/orders/${orderId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

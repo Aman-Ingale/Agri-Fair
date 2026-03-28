@@ -7,7 +7,7 @@ import { MoonLoader } from "react-spinners"
 import { toast } from "sonner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Wheat, MapPin, Clock, Gavel, IndianRupee, PackageCheck, Search, Filter, Sprout, Star, Banknote } from "lucide-react";
-import { cache, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import crops from "@/public/crops.json";
 import Cookies from "js-cookie";
 export default function Listings() {
@@ -27,8 +27,6 @@ export default function Listings() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isFarmer, setIsFarmer] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const url = process.env.NEXT_PUBLIC_BASE_URL;
-
   async function handleApplyFilter() {
     try {
       setIsLoading(true)
@@ -42,7 +40,7 @@ export default function Listings() {
       params.append("grade_min", filteredGrade[0]);
       params.append("grade_max", 5);
 
-      const res = await fetch(`${url}/api/listings?${params.toString()}`)
+      const res = await fetch(`/api/listings?${params.toString()}`)
       if (!res.ok) throw new Error("Failed to fetch listings")
       const data = await res.json()
       setListings(data.data || [])
@@ -79,7 +77,7 @@ export default function Listings() {
       setIsPlacingBid(true)
       setPlacingBidId(id)
 
-      const response = await fetch(`${url}/api/bids`, {
+      const response = await fetch(`/api/bids`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -119,7 +117,7 @@ export default function Listings() {
   async function getData() {
     try {
       setIsLoading(true)
-      const response = await fetch(`${url}/api/listings`)
+      const response = await fetch(`/api/listings`)
       if (!response.ok) {
         const data = await response.json().catch(() => null)
         throw new Error(data?.message || `HTTP ${response.status}`)
