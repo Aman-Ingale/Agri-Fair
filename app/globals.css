@@ -120,3 +120,38 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes agriFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes agriShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.agri-fade-up {
+  animation: agriFadeUp 650ms ease-out both;
+}
+
+.agri-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(16, 185, 129, 0.08),
+    rgba(16, 185, 129, 0.18),
+    rgba(16, 185, 129, 0.08)
+  );
+  background-size: 200% 100%;
+  animation: agriShimmer 1.2s ease-in-out infinite;
+}

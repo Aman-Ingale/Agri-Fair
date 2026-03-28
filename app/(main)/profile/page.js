@@ -12,7 +12,6 @@ const url = process.env.NEXT_PUBLIC_BASE_URL;
 export default function ClientProfile() {
     const [isEditing, setIsEditing] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-    const [isPageLoading, setIsPageLoading] = useState(false)
 
     const id = "";
     const router = useRouter()
@@ -22,46 +21,52 @@ export default function ClientProfile() {
     }
     //PUT request to update client details
     const handleSave = async () => {
-        fetch(`${url}/api/profile`,
-            {
+        setIsLoading(true)
+        try {
+            const res = await fetch(`${url}/api/profile`, {
                 method: "PUT",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    updateData: profile
-                })
+                    updateData: profile,
+                }),
             })
-            toast.success("Profile Updated Successfully")       
+
+            const data = await res.json().catch(() => null)
+            if (!res.ok) {
+                throw new Error(data?.message || "Failed to update profile")
+            }
+
+            toast.success("Profile Updated Successfully")
             setIsEditing(false)
-            getData()
+            await getData()
+        } catch (e) {
+            console.error(e)
+            toast.error("Failed to update profile")
+        } finally {
+            setIsLoading(false)
+        }
     }
     async function getData() {
-
-        fetch(`${url}/api/profile`, {
-            // cache: "force-cache"
-        })
-            .then(response => {
-                if (!response.ok) {
-                    console.log("Network response was not ok " + response.status);
-                }
-                return response.json(); // or response.text()
-            })
-            .then(data => {
-                console.log("Data:", data.data);
-                setProfile(data.data)
-            })
-            .catch(error => {
-                console.error("Fetch error:", error);
-
-            });
+        setIsLoading(true)
+        try {
+            const res = await fetch(`${url}/api/profile`)
+            const data = await res.json().catch(() => null)
+            if (!res.ok) {
+                throw new Error(data?.message || `HTTP ${res.status}`)
+            }
+            setProfile(data?.data || {})
+        } catch (e) {
+            console.error(e)
+            toast.error("Failed to load profile")
+        } finally {
+            setIsLoading(false)
+        }
     }
     useEffect(() => {
         getData()
     }, [])
-    useEffect(() => {
-        getData()
-    }, [isEditing])
     
     //GET request for getting details of Client passing id as params
     return (

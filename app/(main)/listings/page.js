@@ -13,6 +13,8 @@ import Cookies from "js-cookie";
 export default function Listings() {
   const [isPopup, setIsPopup] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [isPlacingBid, setIsPlacingBid] = useState(false)
+  const [placingBidId, setPlacingBidId] = useState(null)
   const [listings, setListings] = useState([])
   const [lisObj, setlisObj] = useState({})
   const [bidPrice, setBidPrice] = useState(0)
@@ -27,22 +29,30 @@ export default function Listings() {
   const [mounted, setMounted] = useState(false)
   const url = process.env.NEXT_PUBLIC_BASE_URL;
 
-  function handleApplyFilter() {
-  const params = new URLSearchParams();
+  async function handleApplyFilter() {
+    try {
+      setIsLoading(true)
+      const params = new URLSearchParams();
 
-  if (filterCrop) params.append("crop", filterCrop);
-  if (filterVariety) params.append("variety", filterVariety);
-  if (filterLocation) params.append("location", filterLocation);
-  if (searchQuery) params.append("search", searchQuery);
+      if (filterCrop) params.append("crop", filterCrop);
+      if (filterVariety) params.append("variety", filterVariety);
+      if (filterLocation) params.append("location", filterLocation);
+      if (searchQuery) params.append("search", searchQuery);
 
-  params.append("grade_min", filteredGrade[0]);
-  params.append("grade_max", 5);
+      params.append("grade_min", filteredGrade[0]);
+      params.append("grade_max", 5);
 
-  fetch(`${url}/api/listings?${params.toString()}`)
-    .then((res) => res.json())
-    .then((data) => setListings(data.data))
-    .catch((err) => console.error(err));
-}
+      const res = await fetch(`${url}/api/listings?${params.toString()}`)
+      if (!res.ok) throw new Error("Failed to fetch listings")
+      const data = await res.json()
+      setListings(data.data || [])
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load filtered listings")
+    } finally {
+      setIsLoading(false)
+    }
+  }
   function handleClearAll() {
   setFilterLocation("");
   setFilterCrop("");
@@ -58,72 +68,73 @@ export default function Listings() {
   function handlePopup(id) {
     setIsPopup(true)
     const temp = listings.find(lis => lis._id == id)
+    if (!temp) return;
     setBidPrice(temp.price)
     setQuantity(temp.available_quantity)
     setlisObj(temp)
   }
-  function handlePlaceBit(id, title, variety,price,far_id) {
-    console.log(id)
-    fetch(`${url}/api/bids`,
-      {
+  async function handlePlaceBit(id, title, variety, price, far_id) {
+    try {
+      if (isPlacingBid) return;
+      setIsPlacingBid(true)
+      setPlacingBidId(id)
+
+      const response = await fetch(`${url}/api/bids`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          farmer_id:far_id,
+          farmer_id: far_id,
           listings_id: id,
           total: Number(finalPrice),
           quantity: Number(quantity),
           title: title,
           variety: variety,
-          bid_price:Number(bidPrice)
-        })
-      }
-    ).then(response => {
-      if (!response.ok) {
-        // throw new Error("Failed with status " + response.status);
-      }
-      return response.json();
-    })
-      .then(data => {
-        console.log("Created:", data);
-        toast.success("Success", {
-          description: "Bid placed succesfully",
+          bid_price: Number(bidPrice)
         })
       })
-      .catch(error => {
-        console.error("Error:", error);
-        toast.error("Error!", {
-          description: "Something went wrong",
-        })
-      });
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data?.message || "Failed to place bid")
+      }
+
+      toast.success("Success", {
+        description: "Bid placed succesfully",
+      })
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Error!", {
+        description: error?.message || "Something went wrong",
+      })
+    } finally {
+      setIsPlacingBid(false)
+      setPlacingBidId(null)
+    }
   }
   useEffect(() => {
     setFinalPrice(quantity * bidPrice)
   }, [quantity, bidPrice])
   async function getData() {
-    fetch(`${url}/api/listings`,{
-      // cache: "force-cache"
-    })
-      .then(response => {
-        if (!response.ok) {
-          console.log("Network response was not ok " + response.status);
-        }
-        return response.json(); // or response.text()
-      })
-      .then(data => {
-        console.log("Data:", data);
-        setListings(data.data)
-      })
-      .catch(error => {
-        console.error("Fetch error:", error);
+    try {
+      setIsLoading(true)
+      const response = await fetch(`${url}/api/listings`)
+      if (!response.ok) {
+        const data = await response.json().catch(() => null)
+        throw new Error(data?.message || `HTTP ${response.status}`)
+      }
 
-      });
+      const data = await response.json()
+      setListings(data.data || [])
+    } catch (error) {
+      console.error("Fetch error:", error);
+      toast.error("Failed to load listings")
+    } finally {
+      setIsLoading(false)
+    }
   }
   useEffect(() => {
-    getData()
-    setIsLoading(false)
     const role = Cookies.get("role");
     if(role === "farmer"){
       setIsFarmer(true)
@@ -132,6 +143,7 @@ export default function Listings() {
     else{
       setIsFarmer(false)
     }
+    getData()
   }, [])
   return (
     <>
@@ -207,7 +219,13 @@ export default function Listings() {
                   <p>₹ {formatter.format(finalPrice)}</p>
                 </div>
                 <div className="flex flex-row md:flex-col gap-4 justify-center items-center">
-                  <Button className="cursor-pointer bg-green-600 hover:bg-green-700 text-white dark:bg-green-700 dark:hover:bg-green-600" onClick={() => handlePlaceBit(lisObj._id, lisObj.title, lisObj.variety,lisObj.price,lisObj.farmer_id)}>Place Bid</Button>
+                  <Button
+                    className="cursor-pointer bg-green-600 hover:bg-green-700 text-white dark:bg-green-700 dark:hover:bg-green-600"
+                    disabled={isPlacingBid && placingBidId === lisObj._id}
+                    onClick={() => handlePlaceBit(lisObj._id, lisObj.title, lisObj.variety, lisObj.price, lisObj.farmer_id)}
+                  >
+                    {isPlacingBid && placingBidId === lisObj._id ? "Placing..." : "Place Bid"}
+                  </Button>
                 </div>
               </div>
             </div>

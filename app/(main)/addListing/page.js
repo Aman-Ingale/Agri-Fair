@@ -184,10 +184,10 @@ export default function AddListingPage() {
                 <Select
                   value={formData.crop}
                   onValueChange={(value) => {
-                    handleSelectChange("crop", value);
-
+                    // Update crop and reset dependent variety in one state update
                     setFormData((prev) => ({
                       ...prev,
+                      crop: value,
                       variety: "",
                     }));
                   }}

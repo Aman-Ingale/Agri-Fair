@@ -5,8 +5,15 @@ const SESSION_COOKIE_NAME = "session";
 const JWT_SECRET = new TextEncoder().encode("aman");
 
 const AUTH_PAGES = new Set(["/login", "/signup"]);
-const PROTECTED_PAGE_PREFIXES = ["/dashboard", "/orders", "/bids", "/profile", ];
-const BUYER_BLOCKED_PAGE_PREFIXES = ["/dashboard","/add"];
+const PROTECTED_PAGE_PREFIXES = [
+  "/dashboard",
+  "/orders",
+  "/bids",
+  "/profile",
+  "/addListing",
+  "/addlisting",
+];
+const BUYER_BLOCKED_PAGE_PREFIXES = ["/dashboard"];
 
 function isProtectedPage(pathname) {
   return PROTECTED_PAGE_PREFIXES.some(

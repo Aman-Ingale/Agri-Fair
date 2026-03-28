@@ -25,7 +25,10 @@ export async function POST(req) {
   const cookie = await cookies();
   try {
     const data = await req.json();
-    const id = cookie.get("id").value;
+    const id = cookie.get("id")?.value;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return Response.json({ success: false, message: "Unauthorized" }, { status: 401 })
+    }
 
     // Validate required fields
     if (
@@ -58,8 +61,8 @@ export async function GET(req) {
   try {
     await dbConnect();
     const cookie = await cookies();
-    const role = cookie.get("role").value;
-    const id = cookie.get("id").value;
+    const role = cookie.get("role")?.value;
+    const id = cookie.get("id")?.value;
     const { searchParams } = new URL(req.url);
     let filters = {};
 
@@ -103,8 +106,8 @@ export async function GET(req) {
         { location: searchRegex },
       ];
     }
-      if (role === 'farmer') {
-      filters.farmer_id = new mongoose.Types.ObjectId(id); 
+    if (role === 'farmer' && id && mongoose.Types.ObjectId.isValid(id)) {
+      filters.farmer_id = new mongoose.Types.ObjectId(id);
     }
     const plainData = await ListingModel.find(filters);
     const data = plainData.map((lis) => JSON.parse(JSON.stringify(lis)));

@@ -59,25 +59,28 @@ const formatter = new Intl.NumberFormat("en-IN", {
   //   }
   // };
   async function getData() {
-    const id = Cookies.get('id');
-        
-    fetch(`${url}/api/dashboard/${id}`, {
-      // cache: "force-cache"
-    })
-      .then(response => {
-        if (!response.ok) {
-          console.log("Network response was not ok " + response.status);
-        }
-        return response.json(); // or response.text()
-      })
-      .then(data => {
-        console.log("Data:", data.data);
-        setFarmer(data.data)
-      })
-      .catch(error => {
-        console.error("Fetch error:", error);
+    setLoading(true)
+    try {
+      const id = Cookies.get("id");
+      if (!id) {
+        toast.error("Please login again")
+        setFarmer({})
+        return
+      }
 
-      });
+      const res = await fetch(`${url}/api/dashboard/${id}`)
+      const data = await res.json().catch(() => null)
+      if (!res.ok) {
+        throw new Error(data?.message || `HTTP ${res.status}`)
+      }
+
+      setFarmer(data?.data || {})
+    } catch (error) {
+      console.error("Fetch error:", error);
+      toast.error("Failed to load dashboard")
+    } finally {
+      setLoading(false)
+    }
   }
   useEffect(() => {
     getData()

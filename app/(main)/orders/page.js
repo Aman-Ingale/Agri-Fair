@@ -19,6 +19,7 @@ function Page() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [isFarmer, setIsFarmer] = useState(true);
+    const [updatingOrderId, setUpdatingOrderId] = useState(null);
 
     // =========================
     // 📦 Fetch Orders
@@ -45,6 +46,7 @@ function Page() {
     // 🔄 Update Order Status (Reusable)
     // =========================
     async function updateOrderStatus(orderId, status) {
+        setUpdatingOrderId(orderId);
         try {
             const res = await fetch(`${url}/api/orders/${orderId}`, {
                 method: "PUT",
@@ -73,6 +75,8 @@ function Page() {
         } catch (error) {
             console.error(error);
             toast.error("Something went wrong");
+        } finally {
+            setUpdatingOrderId(null);
         }
     }
 
@@ -144,32 +148,35 @@ function Page() {
                                 <div className="flex gap-3 flex-wrap">
                                     <Button
                                         className={`bg-red-600 hover:bg-red-800 text-white ${!isFarmer && order.order_status === "placed"?"":"hidden"} `}
+                                        disabled={loading || updatingOrderId === order._id}
                                         onClick={() =>
                                             updateOrderStatus(order._id, "cancelled")
                                         }
                                     >
-                                        Cancel
+                                        {updatingOrderId === order._id ? "Updating..." : "Cancel"}
                                     </Button>
                                     
 
                                     <Button
                                     className={`${isFarmer && order.order_status === "placed"?"":"hidden"}`}
                                         variant="outline"
+                                        disabled={loading || updatingOrderId === order._id}
                                         onClick={() =>
                                             updateOrderStatus(order._id, "confirmed")
                                         }
                                     >
-                                        Confirm
+                                        {updatingOrderId === order._id ? "Updating..." : "Confirm"}
                                     </Button>
 
                                     <Button
                                     className={`${!isFarmer && order.order_status === "confirmed"?"":"hidden"}`}
                                         variant="outline"
+                                        disabled={loading || updatingOrderId === order._id}
                                         onClick={() =>
                                             updateOrderStatus(order._id, "completed")
                                         }
                                     >
-                                        Complete
+                                        {updatingOrderId === order._id ? "Updating..." : "Complete"}
                                     </Button>
                                 </div>
 

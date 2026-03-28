@@ -18,6 +18,8 @@ const page = () => {
     const [bids, setBids] = useState([]); // ✅ fixed
     const [isBuyer, setIsBuyer] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [updatingBidId, setUpdatingBidId] = useState(null);
+    const [orderingBidId, setOrderingBidId] = useState(null);
 
     const url = process.env.NEXT_PUBLIC_BASE_URL;
     const router = useRouter();
@@ -56,6 +58,7 @@ const page = () => {
     // 🔄 Update Bid Status
     // =========================
     async function updateBidStatus(bidId, status) {
+        setUpdatingBidId(bidId);
         try {
             const res = await fetch(`${url}/api/bids/${bidId}`, {
                 method: "PUT",
@@ -80,6 +83,8 @@ const page = () => {
         } catch (error) {
             console.error(error);
             toast.error("Something went wrong");
+        } finally {
+            setUpdatingBidId(null);
         }
     }
 
@@ -88,6 +93,7 @@ const page = () => {
     // =========================
     async function handleOrder(bid) {
         try {
+            setOrderingBidId(bid._id);
             const res = await fetch(`${url}/api/orders`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -114,6 +120,8 @@ const page = () => {
         } catch (error) {
             console.error(error);
             toast.error("Order failed");
+        } finally {
+            setOrderingBidId(null);
         }
     }
 
@@ -190,22 +198,31 @@ const page = () => {
                                     </td>
 
                                     <td className="text-center py-3 px-2 sm:px-4">
-                                        <Button onClick={() => handleOrder(txn)} className={`cursor-pointer text-xs sm:text-sm md:text-base px-2 sm:px-4 py-1 sm:py-2 bg-green-600 hover:bg-green-700 text-white dark:bg-green-700 dark:hover:bg-green-600                     
+                                        <Button
+                                            onClick={() => handleOrder(txn)}
+                                            disabled={loading || orderingBidId === txn._id}
+                                            className={`cursor-pointer text-xs sm:text-sm md:text-base px-2 sm:px-4 py-1 sm:py-2 bg-green-600 hover:bg-green-700 text-white dark:bg-green-700 dark:hover:bg-green-600                     
                                         ${isBuyer && txn.status == 'accepted'
                                                 ? ""
                                                 : "hidden"
 
                                             }`}>
-                                            Order
+                                            {orderingBidId === txn._id ? "Ordering..." : "Order"}
                                         </Button>
                                         <div className={`flex justify-center gap-1 ${!isBuyer && txn.status == 'pending'
                                                 ? ""
                                                 : "hidden"}`}>
-                                        <Button onClick={() => updateBidStatus(txn._id,"accepted")} className={`cursor-pointer text-xs sm:text-sm md:text-base px-2 sm:px-4 py-1 sm:py-2 bg-green-600 hover:bg-green-700 text-white dark:bg-green-700 dark:hover:bg-green-600`}>
-                                            Accept
+                                        <Button
+                                            onClick={() => updateBidStatus(txn._id,"accepted")}
+                                            disabled={loading || updatingBidId === txn._id || orderingBidId === txn._id}
+                                            className={`cursor-pointer text-xs sm:text-sm md:text-base px-2 sm:px-4 py-1 sm:py-2 bg-green-600 hover:bg-green-700 text-white dark:bg-green-700 dark:hover:bg-green-600`}>
+                                            {updatingBidId === txn._id ? "Updating..." : "Accept"}
                                         </Button>
-                                        <Button onClick={() => updateBidStatus(txn._id,"rejected")} className={`cursor-pointer text-xs sm:text-sm md:text-base px-2 sm:px-4 py-1 sm:py-2 bg-red-600 hover:bg-red-700 text-white dark:bg-red-700 dark:hover:bg-red-600`}>
-                                            Reject
+                                        <Button
+                                            onClick={() => updateBidStatus(txn._id,"rejected")}
+                                            disabled={loading || updatingBidId === txn._id || orderingBidId === txn._id}
+                                            className={`cursor-pointer text-xs sm:text-sm md:text-base px-2 sm:px-4 py-1 sm:py-2 bg-red-600 hover:bg-red-700 text-white dark:bg-red-700 dark:hover:bg-red-600`}>
+                                            {updatingBidId === txn._id ? "Updating..." : "Reject"}
                                         </Button>
 
                                         </div>
