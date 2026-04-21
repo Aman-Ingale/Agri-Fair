@@ -11,6 +11,7 @@ export async function POST(req) {
     try {
         const user = await UserModel.findOne({
             email: data.email
+            
         });
         if (!user) {
             console.log("Email is Incorrect");
